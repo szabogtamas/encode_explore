@@ -1,15 +1,16 @@
+ARG NB_USER="encodex"
 FROM jupyter/base-notebook:latest
 
-RUN sudo apt-get update -y && \
-    sudo apt-get install -y s3fs
+USER root
 
-RUN pip3 install jupytext
-RUN pip3 install numpy>=1.15.4
-RUN pip3 install pandas>=1.0.4
-RUN pip3 install matplotlib>=2.0.0
-RUN pip3 install seaborn
-RUN pip3 install pyBigWig
+RUN apt-get update -y && \
+    apt-get install -y s3fs
+
+USER 1000
+
 RUN pip3 install awscli
+RUN conda install jupytext numpy pandas matplotlib seaborn
+RUN conda install pybigwig -c bioconda
 
 # Empty credentials file, needed to access public datasets of ENCODE
 RUN mkdir -p ~/.aws
