@@ -22,3 +22,5 @@ RUN echo '[default] \
   \nregion=eu-central-1 \
   \noutput=json' \
   > ~/.aws/config
+
+RUN chmod a+rwx -R /home/jovyan/work
