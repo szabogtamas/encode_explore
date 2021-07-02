@@ -5,4 +5,4 @@ A Docker container for projects exploring ENCODE data. Setup based on instuction
 ## Usage
 
 Run container calling the below command:
-`docker run --rm -p 8888:8888 -e JUPYTER_ENABLE_LAB=yes -v "${PWD}":/home/encodex/work encodex`
+`docker run --rm -p 127.0.0.1:8888:8888 -v $PWD:/home/encodex -e NB_UID=$UID --user root encodex`
