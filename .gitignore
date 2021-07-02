@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# Store markdown of notebooks, not the figures
+*.ipynb
+
 # Distribution / packaging
 .Python
 build/
