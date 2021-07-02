@@ -26,4 +26,6 @@ RUN echo '[default] \
   > /home/encodex/.aws/config
 
 USER $NB_UID
-ENV NB_USER=encodex
+ENV NB_USER=encodex \
+  CHOWN_HOME=yes \
+  JUPYTER_ENABLE_LAB=yes 
