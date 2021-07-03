@@ -29,7 +29,7 @@ import pyBigWig
 ```
 
 ```python
-experiment_of_interest = "/experiments/ENCSR767LLP/"
+experiment_of_interest = "/experiments/ENCSR767LLP/" # An eCLIP dataset with RBFOX2 as target
 ```
 
 ## Retrieve and read files manifest
@@ -87,6 +87,39 @@ sorted_chroms = sorted(
     key=lambda x: sort_by_chromosome(x[0])
 )
 sorted_chroms
+```
+
+```python
+def make_bar_chart(data, xlab=None, ylab=None, title=None, rot=45, figsize=[14, 10]):
+    plt.figure(figsize=figsize)
+    df = pd.DataFrame(data)
+    ax = sns.barplot(
+        x=0,
+        y=1,
+        data=df,
+        color='black',
+        linewidth=2.5,
+        facecolor=(1, 1, 1, 0),
+        edgecolor=".2"
+    )
+    if xlab:
+        ax.set_xlabel(xlab)
+    if ylab:
+        ax.set_ylabel(ylab)
+    if title:
+        plt.title(title)
+    plt.xticks(rotation=rot)
+    return ax
+```
+
+```python
+sns.set_style('whitegrid')
+make_bar_chart(
+    sorted_chroms,
+    xlab='chromosome',
+    ylab='number of bases',
+    title='Number of bases by chromosome'
+);
 ```
 
 ```python
