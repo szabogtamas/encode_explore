@@ -28,6 +28,10 @@ import seaborn as sns
 import pyBigWig
 ```
 
+```python
+experiment_of_interest = "/experiments/ENCSR767LLP/"
+```
+
 ## Retrieve and read files manifest
 
 ```python
@@ -35,8 +39,13 @@ import pyBigWig
 ```
 
 ```python
-files = pd.read_csv('encode_file_manifest.tsv', sep='\t')
-files.head()
+encodedb_files = pd.read_csv('encode_file_manifest.tsv', sep='\t')
+encodedb_files.head()
+```
+
+```python
+bigwigs = encodedb_files.loc[files.dataset == experiment_of_interest].loc[files.file_format == 'bigWig']
+bigwigs
 ```
 
 ```python
