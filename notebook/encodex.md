@@ -139,5 +139,21 @@ make_bar_chart(
 ```
 
 ```python
+max_signal_by_chrom = []
+for c in sorted_chroms:
+    max_signal_by_chrom.append((c[0], bw.stats(c[0], 0, c[1], type='max')[0]))
+max_signal_by_chrom
+```
+
+```python
+make_bar_chart(
+    max_signal_by_chrom,
+    xlab='chromosome',
+    ylab='max(-log(p-value))',
+    title='Max signal by chromosome'
+)
+```
+
+```python
 
 ```
