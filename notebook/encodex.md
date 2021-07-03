@@ -59,5 +59,13 @@ example_bw
 ```
 
 ```python
+bw = pyBigWig.open('experiment.bigWig')
+```
+
+```python
+
+```
+
+```python
 
 ```
