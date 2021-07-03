@@ -63,7 +63,13 @@ bw = pyBigWig.open('experiment.bigWig')
 ```
 
 ```python
-
+chroms = bw.chroms()
+filtered_chroms = {
+    k: v
+    for k, v in chroms.items()
+    if len(k) < 10
+}
+filtered_chroms
 ```
 
 ```python
