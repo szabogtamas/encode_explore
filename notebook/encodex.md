@@ -73,5 +73,22 @@ filtered_chroms
 ```
 
 ```python
+def sort_by_chromosome(x):
+    chrom_number = x.replace('chr', '')
+    try:
+        return int(chrom_number)
+    except:
+        return np.inf
+```
+
+```python
+sorted_chroms = sorted(
+    ((k, v) for k, v in filtered_chroms.items()),
+    key=lambda x: sort_by_chromosome(x[0])
+)
+sorted_chroms
+```
+
+```python
 
 ```
