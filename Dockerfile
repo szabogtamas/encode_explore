@@ -1,11 +1,6 @@
 ARG NB_USER="encodex"
 FROM jupyter/base-notebook:latest
 
-USER root
-
-RUN apt-get update -y && \
-    apt-get install -y s3fs
-
 RUN pip3 install awscli
 RUN conda install --quiet --yes \
     jupytext numpy pandas matplotlib seaborn && \
