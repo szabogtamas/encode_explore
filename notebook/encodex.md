@@ -28,20 +28,14 @@ import seaborn as sns
 import pyBigWig
 ```
 
+## Retrieve and read files manifest
+
 ```python
-!mkdir -p encode-public
+!aws s3 cp s3://encode-public/encode_file_manifest.tsv encode_file_manifest.tsv --no-sign-request
 ```
 
 ```python
-#TODO create password file !echo XYZ > ~/.passwd-s3fs && chmod 600 ~/.passwd-s3fs
-```
-
-```python
-!s3fs encode-public ./encode-public -o passwd_file=~/.passwd-s3fs
-```
-
-```python
-files = pd.read_csv('encode-public/encode_file_manifest.tsv', sep='\t')
+files = pd.read_csv('encode_file_manifest.tsv', sep='\t')
 files.head()
 ```
 
