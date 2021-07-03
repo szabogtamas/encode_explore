@@ -123,5 +123,21 @@ make_bar_chart(
 ```
 
 ```python
+avg_signal_by_chrom = []
+for c in sorted_chroms:
+    avg_signal_by_chrom.append((c[0], bw.stats(c[0], 0, c[1])[0]))
+avg_signal_by_chrom
+```
+
+```python
+make_bar_chart(
+    avg_signal_by_chrom,
+    xlab='chromosome',
+    ylab='mean(-log(p-value))',
+    title='Average signal by chromosome'
+);
+```
+
+```python
 
 ```
