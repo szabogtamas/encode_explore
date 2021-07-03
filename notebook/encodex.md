@@ -49,5 +49,15 @@ bigwigs
 ```
 
 ```python
+example_bw = bigwigs.s3_uri.head().tolist()
+example_bw = example_bw[1]
+example_bw
+```
+
+```python
+!aws s3 cp {example_bw} experiment.bigWig --no-sign-request
+```
+
+```python
 
 ```
