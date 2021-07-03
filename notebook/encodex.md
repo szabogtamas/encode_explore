@@ -155,5 +155,15 @@ make_bar_chart(
 ```
 
 ```python
+signal_values = bw.values('chr1', 800000, 2000000, numpy=True)
+signal_values
+```
+
+```python
+plt.figure(figsize=[16, 5])
+plt.fill_between(range(len(signal_values)), 0, signal_values, color='black')
+```
+
+```python
 
 ```
