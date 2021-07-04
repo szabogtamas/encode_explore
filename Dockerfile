@@ -9,6 +9,7 @@ RUN conda install --quiet --yes \
     pybigwig -c bioconda && \
     conda clean --all -f -y
 
+USER root
 RUN mkdir -p /usr/local/dev_scripts/encodex
 ADD ./scripts/encodex /usr/local/dev_scripts/encodex
 
