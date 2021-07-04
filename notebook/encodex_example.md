@@ -18,6 +18,7 @@ jupyter:
 ## Setup
 
 ```python
+import sys
 from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
@@ -25,41 +26,26 @@ import seaborn as sns
 ```
 
 ```python
-import pyBigWig
+sys.path.append("/usr/local/dev_scripts")
+
+import encodex
 ```
 
 ```python
-experiment_of_interest = "/experiments/ENCSR767LLP/" # An eCLIP dataset with RBFOX2 as target
+experiments_of_interest = ["/experiments/ENCSR767LLP/"] # An eCLIP dataset with RBFOX2 as target
+region_of_interest = ("chr9", 94178791, 94178963) # positions of miRNA let-7-d
 ```
 
 ## Retrieve and read files manifest
 
 ```python
-!aws s3 cp s3://encode-public/encode_file_manifest.tsv encode_file_manifest.tsv --no-sign-request
-```
-
-```python
-encodedb_files = pd.read_csv('encode_file_manifest.tsv', sep='\t')
+encodedb_files = encodex.io.read_files_manifest()
 encodedb_files.head()
 ```
 
 ```python
-bigwigs = encodedb_files.loc[files.dataset == experiment_of_interest].loc[files.file_format == 'bigWig']
+bigwigs = encodedb_files.loc[(encodedb_files.dataset.isin(experiments_of_interest)) & (encodedb_files.file_format == "bigWig") & (encodedb_files.output_type == "plus strand signal of unique reads")]
 bigwigs
-```
-
-```python
-example_bw = bigwigs.s3_uri.head().tolist()
-example_bw = example_bw[1]
-example_bw
-```
-
-```python
-!aws s3 cp {example_bw} experiment.bigWig --no-sign-request
-```
-
-```python
-bw = pyBigWig.open('experiment.bigWig')
 ```
 
 ```python
@@ -155,7 +141,7 @@ make_bar_chart(
 ```
 
 ```python
-signal_values = bw.values('chr1', 800000, 2000000, numpy=True)
+signal_values = bw.values('chr13', 91351000, 91351800, numpy=True)
 signal_values
 ```
 
