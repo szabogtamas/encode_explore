@@ -49,6 +49,15 @@ bigwigs
 ```
 
 ```python
+fig, ax = plt.subplots()
+for bwf in bigwigs.s3_uri.tolist():
+    bw = encodex.io.read_experiment_bw(example_bw, force_download=True)
+    signal_values = bw.values(region_of_interest[0], region_of_interest[1], region_of_interest[2], numpy=True)
+    ax.plot(range(len(signal_values)), signal_values)
+    ax.set_ylim(0, 3)
+```
+
+```python
 chroms = bw.chroms()
 filtered_chroms = {
     k: v
