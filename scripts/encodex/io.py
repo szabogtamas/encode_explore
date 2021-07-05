@@ -104,9 +104,12 @@ def read_experiment_bw(
     A bigwig object with signal in genomic ranges.
     """
     
+    # Use base filename as default name for bw files
+    base_filename = bw_s3_path.split("/")[-1]
+
     # Download file from S3
     bw_local_path, cleanup_bw = read_from_s3(
-        bw_s3_path, "experiment.bigWig",
+        bw_s3_path, base_filename,
         bw_local_path, force_download
     )
     
