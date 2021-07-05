@@ -32,7 +32,7 @@ import encodex
 ```
 
 ```python
-experiments_of_interest = ["/experiments/ENCSR767LLP/"] # An eCLIP dataset with RBFOX2 as target
+experiments_of_interest = ["ENCSR767LLP/"] # An eCLIP dataset with RBFOX2 as target
 region_of_interest = ("chr9", 94178791, 94178963) # positions of miRNA let-7-d
 ```
 
@@ -44,121 +44,14 @@ encodedb_files.head()
 ```
 
 ```python
-bigwigs = encodedb_files.loc[(encodedb_files.dataset.isin(experiments_of_interest)) & (encodedb_files.file_format == "bigWig") & (encodedb_files.output_type == "plus strand signal of unique reads")]
+bigwigs =  encodex.filters.retrieve_bw_paths_by_experiment(encodedb_files, experiments_of_interest)
 bigwigs
 ```
 
 ```python
-fig, ax = plt.subplots()
-for bwf in bigwigs.s3_uri.tolist():
-    bw = encodex.io.read_experiment_bw(example_bw, force_download=True)
-    signal_values = bw.values(region_of_interest[0], region_of_interest[1], region_of_interest[2], numpy=True)
-    ax.plot(range(len(signal_values)), signal_values)
-    ax.set_ylim(0, 3)
+signal_values = encodex.filters.extract_genomic_range(bigwigs.file_path.tolist(), region_of_interest)
 ```
 
 ```python
-chroms = bw.chroms()
-filtered_chroms = {
-    k: v
-    for k, v in chroms.items()
-    if len(k) < 10
-}
-filtered_chroms
-```
-
-```python
-def sort_by_chromosome(x):
-    chrom_number = x.replace('chr', '')
-    try:
-        return int(chrom_number)
-    except:
-        return np.inf
-```
-
-```python
-sorted_chroms = sorted(
-    ((k, v) for k, v in filtered_chroms.items()),
-    key=lambda x: sort_by_chromosome(x[0])
-)
-sorted_chroms
-```
-
-```python
-def make_bar_chart(data, xlab=None, ylab=None, title=None, rot=45, figsize=[14, 10]):
-    plt.figure(figsize=figsize)
-    df = pd.DataFrame(data)
-    ax = sns.barplot(
-        x=0,
-        y=1,
-        data=df,
-        color='black',
-        linewidth=2.5,
-        facecolor=(1, 1, 1, 0),
-        edgecolor=".2"
-    )
-    if xlab:
-        ax.set_xlabel(xlab)
-    if ylab:
-        ax.set_ylabel(ylab)
-    if title:
-        plt.title(title)
-    plt.xticks(rotation=rot)
-    return ax
-```
-
-```python
-sns.set_style('whitegrid')
-make_bar_chart(
-    sorted_chroms,
-    xlab='chromosome',
-    ylab='number of bases',
-    title='Number of bases by chromosome'
-);
-```
-
-```python
-avg_signal_by_chrom = []
-for c in sorted_chroms:
-    avg_signal_by_chrom.append((c[0], bw.stats(c[0], 0, c[1])[0]))
-avg_signal_by_chrom
-```
-
-```python
-make_bar_chart(
-    avg_signal_by_chrom,
-    xlab='chromosome',
-    ylab='mean(-log(p-value))',
-    title='Average signal by chromosome'
-);
-```
-
-```python
-max_signal_by_chrom = []
-for c in sorted_chroms:
-    max_signal_by_chrom.append((c[0], bw.stats(c[0], 0, c[1], type='max')[0]))
-max_signal_by_chrom
-```
-
-```python
-make_bar_chart(
-    max_signal_by_chrom,
-    xlab='chromosome',
-    ylab='max(-log(p-value))',
-    title='Max signal by chromosome'
-)
-```
-
-```python
-signal_values = bw.values('chr13', 91351000, 91351800, numpy=True)
-signal_values
-```
-
-```python
-plt.figure(figsize=[16, 5])
-plt.fill_between(range(len(signal_values)), 0, signal_values, color='black')
-```
-
-```python
-
+encodex.viz.plot_range_coverage(signal_values)
 ```
