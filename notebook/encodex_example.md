@@ -32,7 +32,7 @@ import encodex
 ```
 
 ```python
-experiments_of_interest = ["ENCSR767LLP/"] # An eCLIP dataset with RBFOX2 as target
+experiments_of_interest = ["ENCSR767LLP"] # An eCLIP dataset with RBFOX2 as target
 region_of_interest = ("chr9", 94178791, 94178963) # positions of miRNA let-7-d
 ```
 
@@ -49,7 +49,7 @@ bigwigs
 ```
 
 ```python
-signal_values = encodex.filters.extract_genomic_range(bigwigs.file_path.tolist(), region_of_interest)
+signal_values = encodex.filters.combine_experiment_signals(bigwigs.s3_uri.tolist(), region_of_interest)
 ```
 
 ```python
