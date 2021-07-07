@@ -30,7 +30,7 @@ def retrieve_bw_paths_by_experiment(
     m1 = encodedb_files.dataset.isin(experiments)
     m2 = (encodedb_files.file_format == "bigWig")
     m3 = (encodedb_files.output_type == strand)
-    m3 = (encodedb_files.assembly == assembly)
+    m4 = (encodedb_files.assembly == assembly)
     bigwigs = encodedb_files.loc[m1 & m2 & m3 & m4]
 
     return bigwigs
@@ -54,7 +54,8 @@ def extract_genomic_range(
 
     chromosome, start, end = gn_range
     experiment_id = s3_path.split("/")[-1]
-    bw = module_io.read_experiment_bw(s3_path)
+    experiment_id = experiment_id.split(".")[0]
+    bw = module_io.read_experiment_bw(s3_path, keep_file=True)
     signals = bw.values(chromosome, start, end, numpy=True)
 
     signal_tab = pd.DataFrame({"Position": range(start, end), experiment_id: signals})
