@@ -7,7 +7,7 @@ def plot_range_coverage(
     chromosome: str = "Genome position",
     annotation = None,
     ax: Union[None, plt.axis] = None
-) -> plt.axes.Axes:
+) -> plt.axis:
     """
     Plot normalized signal over a genomic range, from multiple bigWig files
     ----------

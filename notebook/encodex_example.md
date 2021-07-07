@@ -60,10 +60,16 @@ signal_values.head()
 ```
 
 ```python
-genome_annotation = encodex.filters.read_genome_annotation(gencode_annotation)
-genome_annotation.loc[(annotation.Chr == region_of_interest[0]) & ((annotation.Start_g < region_of_interest[2]) & (annotation.End_g > region_of_interest[1]))].head()
+genome_annotation = encodex.io.read_genome_annotation(gencode_annotation)
+genome_annotation.loc[
+    (genome_annotation.Chr == region_of_interest[0]) &
+    (
+        (genome_annotation.Start_g < region_of_interest[2]) &
+        (genome_annotation.End_g > region_of_interest[1])
+    )
+]
 ```
 
 ```python
-encodex.viz.plot_range_coverage(signal_values, region_of_interest[0], genome_annotation)
+ax = encodex.viz.plot_range_coverage(signal_values, region_of_interest[0], genome_annotation)
 ```
