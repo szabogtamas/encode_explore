@@ -1,19 +1,41 @@
-ARG NB_USER="encodex"
-FROM jupyter/base-notebook:latest
+FROM szabogtamas/jupy_rocker
 
-RUN pip3 install awscli
-RUN conda install --quiet --yes \
-    jupytext numpy pandas matplotlib seaborn && \
-    conda clean --all -f -y 
-RUN conda install --quiet --yes \
-    pybigwig -c bioconda && \
-    conda clean --all -f -y
+RUN sudo apt-get update -y
+RUN sudo apt-get install -y libxt-dev
+RUN sudo apt-get install -y libx11-dev
+RUN sudo apt-get install -y libcairo2-dev
+RUN sudo apt-get install -y libxml2-dev
+RUN sudo apt-get install -y bedtools
 
-USER root
+RUN pip3 install numpy && \
+    pip3 install pandas && \
+    pip3 install matplotlib && \
+    pip3 install seaborn && \
+    pip3 install awscli && \
+    pip3 install pyBigWig
+
 RUN mkdir -p /usr/local/dev_scripts/encodex
 ADD ./scripts/encodex /usr/local/dev_scripts/encodex
 
-USER $NB_UID
-ENV NB_USER=encodex \
-  CHOWN_HOME=yes \
-  JUPYTER_ENABLE_LAB=yes
+RUN install2.r --error \
+    --deps TRUE \
+    devtools \
+    rlang \
+    optparse \
+    docstring \
+    plotly \
+    heatmaply \
+    RColorBrewer \
+    ggsci \
+    pROC \
+    openxlsx \
+    readxl \
+    googledrive \
+    aws.s3
+
+RUN R -e "devtools::install_github('kassambara/ggpubr')"
+RUN R -e "BiocManager::install('ggbio')"
+RUN R -e "BiocManager::install('RCAS')"
+
+RUN chmod a+rwx -R /home/rstudio
+ADD ./configs/rstudio-prefs.json /home/rstudio/.config/rstudio/rstudio-prefs.json
