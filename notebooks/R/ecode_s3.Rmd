@@ -57,3 +57,37 @@ system(
 manifests <- read.csv(encode_local_manifest, sep="\t")
 head(manifests)
 ```
+
+## Get files associated with experiment
+
+```{r}
+samples_df <- manifests %>%
+  dplyr::filter(dataset %in% paste0("/experiments/", params$experiments_of_interest, "/")) %>%
+  dplyr::filter(file_format == "bigWig") %>%
+  dplyr::filter(output_type == "plus strand signal of unique reads") %>%
+  dplyr::filter(assembly == "GRCh38") %>%
+  dplyr::select(accession, dataset, s3_uri) %>%
+  mutate(dataset = gsub("/experiments/", "", dataset)) %>%
+  mutate(dataset = gsub("/", "", dataset))
+
+samples_df
+```
+
+```{r}
+download_bw_files <- function(accession, dataset, s3_uri) {
+  local_path <- paste(accession, "bigWig", sep=".")
+  #system(paste("aws s3 cp", s3_uri, local_path, "--no-sign-request", sep=" "), intern=FALSE)
+  data.frame(accession=accession, dataset=dataset, s3_uri=s3_uri, local_path, scaling_factor=1)
+}
+
+local_samples_df <- samples_df %>%
+  pmap(download_bw_files) %>%
+  bind_rows() %>%
+  dplyr::select(
+    sample_id=accession, track_id=accession, colour_group=dataset, scaling_factor,
+    bigWig=local_path
+  )
+
+local_samples_df
+```
+
