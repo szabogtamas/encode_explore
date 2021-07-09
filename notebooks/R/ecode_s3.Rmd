@@ -34,7 +34,6 @@ encode_files_manifest_s3 <- params$encode_files_manifest_s3
 encode_local_manifest <- params$encode_local_manifest
 ```
 
-
 ## Check S3 repo contents
 
 The recommended way would be to use the dedicated R package for download
@@ -91,7 +90,6 @@ local_samples_df <- samples_df %>%
 local_samples_df
 ```
 
-
 ## Parse genome annotation
 
 ```{r}
@@ -120,4 +118,10 @@ focused_region_of_genome <- subsetByOverlaps(annotated_GR, region_query)
 
 ```{r}
 plotTranscripts(focused_region_of_genome)
+```
+
+## Show results
+
+```{r fig.height=9.6, fig.width=4.8}
+plotCoverage(focused_region_of_genome, track_data=local_samples_df, heights=c(4,1))
 ```
