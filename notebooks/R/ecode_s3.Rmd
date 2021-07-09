@@ -91,3 +91,33 @@ local_samples_df <- samples_df %>%
 local_samples_df
 ```
 
+
+## Parse genome annotation
+
+```{r}
+remove_gtf <- FALSE
+genome_annotation_gtf <- params$genome_annotation
+if (substr(params$genome_annotation, 1, 5) == "s3://") {
+  genome_annotation_gtf <- "tmp_gtf.gtf.gz"
+  remove_gtf <- TRUE
+}
+```
+
+```{r}
+genome <- makeTxDbFromGFF(genome_annotation_gtf)
+if (remove_gtf) unlink(genome_annotation_gtf)
+annotated_GR <- exonsBy(genome, by="gene")
+```
+
+```{r}
+region_query <- GRanges(
+  seqnames=params$chromosome,
+  ranges=IRanges(start=params$genomic_range[1], end=params$genomic_range[2]),
+  strand="+"
+)
+focused_region_of_genome <- subsetByOverlaps(annotated_GR, region_query)
+```
+
+```{r}
+plotTranscripts(focused_region_of_genome)
+```
