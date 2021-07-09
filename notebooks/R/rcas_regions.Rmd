@@ -101,3 +101,26 @@ transcriptCoords <- transcripts(gtf_genome)
 sample_1_bed <- importBed(filePath="ENCFF465VPI.bed", sampleN=5000)
 sample_2_bed <- importBed(filePath="ENCFF683UDV.bed", sampleN=5000)
 ```
+
+```{r}
+cvgF <- getFeatureBoundaryCoverage(
+  queryRegions = sample_1_bed,
+  featureCoords = transcriptCoords,
+  flankSize = 500,
+  boundaryType = 'fiveprime',
+  sampleN = 1000
+)
+```
+```{r}
+cvgT <- getFeatureBoundaryCoverage(
+  queryRegions = sample_1_bed,
+  featureCoords = transcriptCoords,
+  flankSize = 500,
+  boundaryType = 'threeprime',
+  sampleN = 1000
+)
+```
+
+```{r}
+plotFeatureBoundaryCoverage(cvgF = cvgF, cvgT = cvgT, featureName = 'transcript') 
+```
