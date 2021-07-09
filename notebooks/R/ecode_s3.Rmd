@@ -1,0 +1,59 @@
+---
+title: "`r params$report_title`"
+author: "`r params$report_author`"
+date: "`r params$report_time`"
+output:
+  html_document:
+    toc: True
+params:
+  report_title: "Retrieve ECODE data files"
+  report_author: "Anonymus"
+  report_time: !r format(Sys.Date(), format="%d/%m/%Y")
+  genome_annotation: "s3://encode-public/2019/06/04/8f6cba12-2ebe-4bec-a15d-53f498979de0/gencode.v29.primary_assembly.annotation_UCSC_names.gtf.gz"
+  encode_files_manifest_s3: "s3://encode-public/encode_file_manifest.tsv"
+  encode_local_manifest: "encode_s3_manifest.tsv"
+  experiments_of_interest: ["ENCSR767LLP"]
+  chromosome: "chr9"
+  genomic_range: [94178791, 94178963]
+---
+
+## Setup
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(aws.s3)
+library(wiggleplotr)
+library(GenomicRanges)
+library(GenomicFeatures)
+```
+
+```{r}
+encode_files_manifest_s3 <- params$encode_files_manifest_s3
+encode_local_manifest <- params$encode_local_manifest
+```
+
+
+## Check S3 repo contents
+
+The recommended way would be to use the dedicated R package for download
+
+```{r}
+manifests <- s3read_using(FUN=read.csv, object=encode_files_manifest_s3, region="us-east-1")
+head(manifests)
+```
+
+The public ENCODE bucket does not work well with `aws.s3`, unfortunately, so downloading from cli
+
+```{r}
+system(
+  paste("aws s3 cp", encode_files_manifest, encode_local_manifest, "--no-sign-request", sep=" "),
+  intern=FALSE
+)
+```
+
+```{r}
+manifests <- read.csv(encode_local_manifest, sep="\t")
+head(manifests)
+```
