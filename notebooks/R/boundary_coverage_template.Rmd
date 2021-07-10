@@ -22,3 +22,21 @@ library(RCAS)
 library(GenomicRanges)
 library(GenomicFeatures)
 ```
+
+## Parse genome annotation
+
+```{r}
+remove_gtf <- FALSE
+genome_annotation_gtf <- params$genome_annotation
+if (substr(params$genome_annotation, 1, 5) == "s3://") {
+  genome_annotation_gtf <- "tmp_gtf.gtf.gz"
+  remove_gtf <- TRUE
+  system(
+    paste(
+      "aws s3 cp", params$genome_annotation,
+      genome_annotation_gtf, "--no-sign-request", sep=" "
+    ),
+    intern=FALSE
+  )
+}
+```
