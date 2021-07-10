@@ -47,3 +47,9 @@ gtf_genome <- makeTxDbFromGFF(genome_annotation_gtf)
 if (remove_gtf) unlink(genome_annotation_gtf)
 transcriptCoords <- transcripts(gtf_genome)
 ```
+
+## Feature Boundary Coverage Profile
+
+```{r}
+sample_bed <- importBed(filePath=params$input_path, sampleN=5000)
+```
