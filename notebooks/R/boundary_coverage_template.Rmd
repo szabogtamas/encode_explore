@@ -40,3 +40,10 @@ if (substr(params$genome_annotation, 1, 5) == "s3://") {
   )
 }
 ```
+
+```{r}
+base_gff <- importGtf(genome_annotation_gtf)
+gtf_genome <- makeTxDbFromGFF(genome_annotation_gtf)
+if (remove_gtf) unlink(genome_annotation_gtf)
+transcriptCoords <- transcripts(gtf_genome)
+```
