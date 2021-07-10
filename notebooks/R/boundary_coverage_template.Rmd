@@ -15,3 +15,10 @@ params:
 
 ## Setup
 
+```{r}
+library(dplyr)
+library(tidyr)
+library(RCAS)
+library(GenomicRanges)
+library(GenomicFeatures)
+```
