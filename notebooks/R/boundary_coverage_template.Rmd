@@ -57,16 +57,17 @@ summary <- summarizeQueryRegions(queryRegions = sample_bed, txdbFeatures = txdb_
 ```
 
 ```{r}
+N_features = length(sample_bed)
 summary %>%
   data.frame() %>%
   mutate(
-    percent = round((count / length(queryRegions)), 3) * 100
+    percent = round((count / N_features), 3) * 100
   ) %>%
   tibble::rownames_to_column("feature") %>%
   ggplot(aes(x = reorder(feature, -percent), y = percent)) + 
   geom_bar(stat = 'identity', aes(fill = feature)) + 
   geom_label(aes(y = percent + 3), label = df$count) + 
-  labs(x = 'transcript feature', y = paste0('percent overlap (n = ', length(queryRegions), ')')) + 
+  labs(x = 'transcript feature', y = paste0('percent overlap (n = ', N_features, ')')) + 
   theme_bw(base_size = 14) + 
   theme(axis.text.x = element_text(angle = 90))
 ```
