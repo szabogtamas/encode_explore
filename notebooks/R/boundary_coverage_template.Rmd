@@ -21,6 +21,8 @@ library(tidyr)
 library(RCAS)
 library(GenomicRanges)
 library(GenomicFeatures)
+library(ggplot2)
+library(ggsci)
 ```
 
 ## Parse genome annotation
@@ -68,6 +70,7 @@ summary %>%
   geom_bar(stat = 'identity', aes(fill = feature)) + 
   geom_label(aes(y = percent + 3), label = count) + 
   labs(x = 'transcript feature', y = paste0('percent overlap (n = ', N_features, ')')) + 
+  scale_fill_npg() +
   theme_bw(base_size = 14) + 
   theme(axis.text.x = element_text(angle = 90))
 ```
@@ -75,24 +78,20 @@ summary %>%
 ## Feature Boundary Coverage Profile
 
 ```{r}
-base_gff <- importGtf(genome_annotation_gtf)
-gtf_genome <- makeTxDbFromGFF(genome_annotation_gtf)
-if (remove_gtf) unlink(genome_annotation_gtf)
-transcriptCoords <- transcripts(gtf_genome)
-```
-
-```{r}
-cvgF <- getFeatureBoundaryCoverage(
+cvgList <- calculateCoverageProfileList(
   queryRegions = sample_bed,
-  featureCoords = transcriptCoords,
-  flankSize = 500,
-  boundaryType = 'fiveprime',
-  sampleN = 1000
+  targetRegionsList = txdb_features,
+  sampleN = 10000
 )
 ```
 
 
 ```{r}
-
+ggplot2::ggplot(cvgList, aes(x = bins, y = meanCoverage)) + 
+  geom_ribbon(fill = 'lightgreen', 
+              aes(ymin = meanCoverage - standardError * 1.96, 
+                  ymax = meanCoverage + standardError * 1.96)) + 
+ geom_line(color = 'black') + theme_bw(base_size = 14) +
+ facet_wrap( ~ feature, ncol = 3) 
 ```
 
