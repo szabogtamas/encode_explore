@@ -87,11 +87,16 @@ cvgList <- calculateCoverageProfileList(
 
 
 ```{r}
-ggplot2::ggplot(cvgList, aes(x = bins, y = meanCoverage)) + 
-  geom_ribbon(fill = 'lightgreen', 
-              aes(ymin = meanCoverage - standardError * 1.96, 
-                  ymax = meanCoverage + standardError * 1.96)) + 
- geom_line(color = 'black') + theme_bw(base_size = 14) +
- facet_wrap( ~ feature, ncol = 3) 
+cvgList %>%
+  ggplot(aes(x = bins, y = meanCoverage)) + 
+  geom_ribbon(
+    fill = 'lightgreen', aes(
+      ymin = meanCoverage - standardError * 1.96,
+      ymax = meanCoverage + standardError * 1.96
+    )
+  ) + 
+  geom_line(color = 'black') +
+  theme_bw(base_size = 14) +
+  facet_wrap( ~ feature, ncol = 3) 
 ```
 
