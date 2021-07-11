@@ -66,7 +66,7 @@ summary %>%
   tibble::rownames_to_column("feature") %>%
   ggplot(aes(x = reorder(feature, -percent), y = percent)) + 
   geom_bar(stat = 'identity', aes(fill = feature)) + 
-  geom_label(aes(y = percent + 3), label = df$count) + 
+  geom_label(aes(y = percent + 3), label = count) + 
   labs(x = 'transcript feature', y = paste0('percent overlap (n = ', N_features, ')')) + 
   theme_bw(base_size = 14) + 
   theme(axis.text.x = element_text(angle = 90))
