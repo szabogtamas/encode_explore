@@ -42,16 +42,40 @@ if (substr(params$genome_annotation, 1, 5) == "s3://") {
 ```
 
 ```{r}
-base_gff <- importGtf(genome_annotation_gtf)
-gtf_genome <- makeTxDbFromGFF(genome_annotation_gtf)
-if (remove_gtf) unlink(genome_annotation_gtf)
-transcriptCoords <- transcripts(gtf_genome)
+genome_range_features <- importGtf(genome_annotation_gtf)
+txdb_features <- getTxdbFeaturesFromGRanges(genome_range_features)
+```
+
+## Show features
+
+```{r}
+sample_bed <- importBed(filePath=params$input_path, sampleN=5000)
+```
+
+```{r}
+summary <- summarizeQueryRegions(queryRegions = sample_bed, txdbFeatures = txdb_features)
+```
+
+```{r}
+
+df <- data.frame(summary)
+df$percent <- round((df$count / length(queryRegions)), 3) * 100
+df$feature <- rownames(df)
+ggplot2::ggplot(df, aes(x = reorder(feature, -percent), y = percent)) + 
+  geom_bar(stat = 'identity', aes(fill = feature)) + 
+  geom_label(aes(y = percent + 3), label = df$count) + 
+  labs(x = 'transcript feature', y = paste0('percent overlap (n = ', length(queryRegions), ')')) + 
+  theme_bw(base_size = 14) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ## Feature Boundary Coverage Profile
 
 ```{r}
-sample_bed <- importBed(filePath=params$input_path, sampleN=5000)
+base_gff <- importGtf(genome_annotation_gtf)
+gtf_genome <- makeTxDbFromGFF(genome_annotation_gtf)
+if (remove_gtf) unlink(genome_annotation_gtf)
+transcriptCoords <- transcripts(gtf_genome)
 ```
 
 ```{r}
@@ -63,3 +87,9 @@ cvgF <- getFeatureBoundaryCoverage(
   sampleN = 1000
 )
 ```
+
+
+```{r}
+
+```
+
