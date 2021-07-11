@@ -74,6 +74,23 @@ summary %>%
   theme_bw(base_size = 14) + 
   theme(axis.text.x = element_text(angle = 90))
 ```
+```{r}
+range_overlaps <- as.data.table(queryGff(queryRegions = sample_bed, gffData = genome_range_features))
+```
+
+```{r}
+biotype_col <- grep('gene_type', colnames(range_overlaps), value = T)
+df <- range_overlaps[,length(unique(queryIndex)), by = biotype_col]
+colnames(df) <- c("feature", "count")
+df$percent <- round(df$count / N_features * 100, 1)
+df <- df[order(count, decreasing = TRUE)]
+ggplot2::ggplot(df, aes(x = reorder(feature, -percent), y = percent)) + 
+  geom_bar(stat = 'identity', aes(fill = feature)) + 
+  geom_label(aes(y = percent + 0.5), label = df$count) + 
+  labs(x = 'transcript feature', y = paste0('percent overlap (n = ', N_features, ')')) + 
+  theme_bw(base_size = 14) + 
+  theme(axis.text.x = element_text(angle = 90))
+```
 
 ## Feature Boundary Coverage Profile
 
