@@ -51,7 +51,7 @@ txdb_features <- getTxdbFeaturesFromGRanges(genome_range_features)
 ## Show features
 
 ```{r}
-sample_bed <- importBed(filePath=params$input_path, sampleN=5000)
+sample_bed <- importBed(filePath=params$input_path)
 ```
 
 ```{r}
@@ -102,8 +102,7 @@ df %>%
 ```{r}
 cvgList <- calculateCoverageProfileList(
   queryRegions = sample_bed,
-  targetRegionsList = txdb_features,
-  sampleN = 10000
+  targetRegionsList = txdb_features
 )
 ```
 
