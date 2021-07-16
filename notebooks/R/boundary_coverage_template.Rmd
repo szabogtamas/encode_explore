@@ -148,6 +148,10 @@ cvgList <- calculateCoverageProfileList(
 )
 ```
 
+```{r}
+write.csv(cvgList, params$boundary_table_path)
+```
+
 
 ```{r}
 cvgList %>%
