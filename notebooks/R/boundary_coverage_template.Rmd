@@ -90,7 +90,10 @@ head(range_overlaps)
 
 ```{r}
 transcript_info <- range_overlaps %>%
-  dplyr::distinct(gene_id, gene_name, gene_type, transcript_type, query_name, query_score)
+  dplyr::distinct(
+    gene_id, gene_name, gene_type, transcript_type, type, query_name, query_score,
+    width
+  )
 
 write.csv(transcript_info, params$transcript_table_path)
 
@@ -120,6 +123,21 @@ trx_overlap_tab %>%
     legend.position = "none"
   )
 ```
+
+## Feture type ratios
+
+```{r}
+trx_type_tab <- transcript_info %>%
+  head(150) %>%
+  dplyr::distinct(gene_name, query_name, type, .keep_all=TRUE) %>%
+  group_by(gene_name, type) %>%
+  mutate(
+    feture_count = n()
+  ) %>%
+  ungroup() %>%
+  arrange(gene_name)
+```
+
 
 ## Feature Boundary Coverage Profile
 
