@@ -146,12 +146,31 @@ exon_utr_ratio_tab <- trx_type_tab %>%
   ) %>%
   pivot_wider(names_from=type, values_from=trn, values_fn=length) %>%
   mutate(
-    eur = exon / UTR
+    ure = UTR / exon
   ) %>%
   arrange(desc(UTR))
 
 head(exon_utr_ratio_tab)
 ```
+
+```{r}
+exon_utr_ratio_tab %>%
+  mutate(
+    sum_read = UTR + exon,
+    ure = UTR / sum_read
+  ) %>%
+  ggplot(aes(x=sum_read, y=ure)) + 
+  geom_point() + 
+  labs(x = "Read count", y = "Percent of reads overlapping UTR") + 
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_npg() +
+  theme_bw(base_size=14) + 
+  theme(
+    axis.text.x = element_text(angle=30, hjust=1),
+    legend.position = "none"
+  )
+```
+
 
 ## Feature Boundary Coverage Profile
 
