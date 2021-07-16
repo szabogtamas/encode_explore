@@ -133,15 +133,22 @@ cvgList <- calculateCoverageProfileList(
 
 ```{r}
 cvgList %>%
+  dplyr::filter(feature != "cds") %>%
+  mutate(
+    feature = factor(feature, levels=c(
+      "promoters", "transcripts", "threeUTRs", "exons", "introns", "fiveUTRs"
+    ))
+  ) %>%
   ggplot(aes(x = bins, y = meanCoverage)) + 
   geom_ribbon(
-    fill = 'lightgreen', aes(
+    aes(
       ymin = meanCoverage - standardError * 1.96,
       ymax = meanCoverage + standardError * 1.96
-    )
+    ), fill = "lightgray"
   ) + 
-  geom_line(color = 'black') +
-  theme_bw(base_size = 14) +
-  facet_wrap( ~ feature, ncol = 3) 
+  geom_line() +
+  scale_fill_npg() +
+  theme_bw(base_size=14) +
+  facet_wrap( ~ feature, ncol=3) 
 ```
 
