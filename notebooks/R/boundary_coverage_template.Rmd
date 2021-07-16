@@ -124,11 +124,10 @@ trx_overlap_tab %>%
   )
 ```
 
-## Feture type ratios
+## Feature type ratios
 
 ```{r}
 trx_type_tab <- transcript_info %>%
-  head(150) %>%
   dplyr::distinct(gene_name, query_name, type, .keep_all=TRUE) %>%
   group_by(gene_name, type) %>%
   mutate(
@@ -138,6 +137,21 @@ trx_type_tab <- transcript_info %>%
   arrange(gene_name)
 ```
 
+```{r}
+exon_utr_ratio_tab <- trx_type_tab %>%
+  dplyr::filter(type %in% c("exon", "UTR")) %>%
+  dplyr::select(type, gene_name) %>%
+  mutate(
+    trn = 1
+  ) %>%
+  pivot_wider(names_from=type, values_from=trn, values_fn=length) %>%
+  mutate(
+    eur = exon / UTR
+  ) %>%
+  arrange(desc(UTR))
+
+head(exon_utr_ratio_tab)
+```
 
 ## Feature Boundary Coverage Profile
 
