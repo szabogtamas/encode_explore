@@ -14,6 +14,15 @@ params:
   input_bed_folder: "beds"
 ---
 
+## Setup
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(ggsci)
+```
+
 ## Retrieve genome annotation
 
 ```{r}
