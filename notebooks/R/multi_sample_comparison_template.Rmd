@@ -41,9 +41,10 @@ bed_inputs
 
 ```{r}
 for (bed in bed_inputs) {
-  bed_base <- strsplit(basename(bed), '.', fixed=TRUE)[[1]]
+  bed_base <- unlist(strsplit(basename(bed_inputs[1]), '.', fixed=TRUE))[1]
   rmarkdown::render(
-    paste(bed_base, "Rmd", sep="."),
+    "single_sample_explorative_template.Rmd",
+    output_file = paste(bed_base, "html", sep="."),
     params = list(
       report_author = params$report_author,
       report_title = paste("Transcript-based read stats for", bed_base, sep=" "),
