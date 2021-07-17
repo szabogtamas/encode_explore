@@ -100,7 +100,6 @@ write.csv(transcript_info, params$transcript_table_path)
 head(transcript_info)
 ```
 
-
 ```{r}
 trx_overlap_tab <- transcript_info %>%
   dplyr::distinct(gene_name, query_name, gene_type) %>%
@@ -171,7 +170,6 @@ exon_utr_ratio_tab %>%
   )
 ```
 
-
 ## Feature Boundary Coverage Profile
 
 ```{r}
@@ -184,7 +182,6 @@ cvgList <- calculateCoverageProfileList(
 ```{r}
 write.csv(cvgList, params$boundary_table_path)
 ```
-
 
 ```{r}
 cvgList %>%
@@ -206,4 +203,3 @@ cvgList %>%
   theme_bw(base_size=14) +
   facet_wrap( ~ feature, ncol=3) 
 ```
-

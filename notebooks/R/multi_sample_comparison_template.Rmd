@@ -1,0 +1,22 @@
+---
+title: "`r params$report_title`"
+author: "`r params$report_author`"
+date: "`r params$report_time`"
+output:
+  html_document:
+    toc: True
+params:
+  report_title: "Compare transcript boundary coverage stats for multiple samples"
+  report_author: "Anonymus"
+  report_time: !r format(Sys.Date(), format="%d/%m/%Y")
+  genome_annotation: "s3://encode-public/2019/06/04/8f6cba12-2ebe-4bec-a15d-53f498979de0/gencode.v29.primary_assembly.annotation_UCSC_names.gtf.gz"
+  input_bed_folder: "beds"
+---
+
+## Parse individual samples
+
+```{r}
+bed_inputs <- dir(params$input_bed_folder, full.names=TRUE)
+
+bed_inputs
+```
