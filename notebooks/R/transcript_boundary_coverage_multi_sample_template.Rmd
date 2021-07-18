@@ -78,7 +78,11 @@ samples_metadata
 coverage_tables <- "." %>%
   dir(full.names=TRUE, pattern="transcriptboundaries.csv") %>%
   map_df(read.csv, .id=FILENAME) %>%
-  bind_rows()
+  bind_rows() %>%
+  mutate(
+    CONDITION = basename(FILENAME),
+    CONDITION = gsub("transcriptboundaries.csv", "", CONDITION)
+  )
 
 head(coverage_tables)
 ```
