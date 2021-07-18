@@ -59,8 +59,8 @@ for (bed in bed_inputs) {
       report_title = paste("Transcript boundary coverage for", bed_base, sep=" "),
       genome_annotation = genome_annotation_gtf,
       input_path = bed,
-      transcript_table_path = paste(bed_base, "transcriptboundaries.csv", sep="_"),
-      transcript_figure_path = paste(bed_base, "transcriptboundariess.pdf", sep="_")
+      boundary_table_path = paste(bed_base, "transcriptboundaries.csv", sep="_"),
+      boundary_figure_path = paste(bed_base, "transcriptboundariess.pdf", sep="_")
     )
   )
 }
