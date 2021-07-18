@@ -72,3 +72,13 @@ for (bed in bed_inputs) {
 samples_metadata <- read.csv(params$samples_metadata)
 samples_metadata
 ```
+
+```{r}
+coverage_tables <- "." %>%
+  dir(full.names=TRUE, pattern="transcriptboundaries.csv") %>%
+  map_df(read.csv, .id=FILENAME) %>%
+  bind_rows()
+
+head(coverage_tables)
+```
+
