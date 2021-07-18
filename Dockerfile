@@ -18,8 +18,7 @@ RUN pip3 install numpy && \
 
 ENV PATH=/usr/local/bin:$PATH
 
-RUN mkdir -p /usr/local/dev_scripts/encodex
-ADD ./scripts/encodex /usr/local/dev_scripts/encodex
+ADD ./scripts /usr/local/dev_scripts
 
 RUN install2.r --error \
     --deps TRUE \
