@@ -87,3 +87,24 @@ coverage_tables <- "." %>%
 head(coverage_tables)
 ```
 
+```{r}
+coverage_tables %>%
+  dplyr::filter(feature != "cds") %>%
+  mutate(
+    feature = factor(feature, levels=c(
+      "promoters", "transcripts", "threeUTRs", "exons", "introns", "fiveUTRs"
+    ))
+  ) %>%
+  ggplot(aes(x = bins, y = meanCoverage, color = CONDITION, fill = CONDITION)) + 
+  geom_ribbon(
+    aes(
+      ymin = meanCoverage - standardError * 1.96,
+      ymax = meanCoverage + standardError * 1.96
+    )
+  ) + 
+  geom_line() +
+  scale_fill_npg() +
+  scale_color_npg() +
+  theme_bw(base_size=14) +
+  facet_wrap( ~ feature, ncol=3)
+```
