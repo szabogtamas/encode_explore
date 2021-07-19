@@ -53,8 +53,8 @@ bed_inputs
 for (bed in bed_inputs) {
   bed_base <- unlist(strsplit(basename(bed), '.', fixed=TRUE))[1]
   rmarkdown::render(
-    "transcript_boundary_coverage_single_sample_template.Rmd",
-    output_file = paste(paste(bed_base, "coverage", sep="_"), "html", sep="."),
+    "exon_utr_ratio_single_sample_template.Rmd",
+    output_file = paste(paste(bed_base, "utrtoexon", sep="_"), "html", sep="."),
     params = list(
       report_author = params$report_author,
       report_title = paste("UTR to exon ratios for", bed_base, sep=" "),
