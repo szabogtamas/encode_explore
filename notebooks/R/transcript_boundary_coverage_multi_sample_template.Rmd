@@ -54,14 +54,14 @@ for (bed in bed_inputs) {
   bed_base <- unlist(strsplit(basename(bed), '.', fixed=TRUE))[1]
   rmarkdown::render(
     "transcript_boundary_coverage_single_sample_template.Rmd",
-    output_file = paste(bed_base, "html", sep="."),
+    output_file = paste(paste(bed_base, "coverage", sep="_"), "html", sep="."),
     params = list(
       report_author = params$report_author,
       report_title = paste("Transcript boundary coverage for", bed_base, sep=" "),
       genome_annotation = genome_annotation_gtf,
       input_path = bed,
       boundary_table_path = paste(bed_base, "transcriptboundaries.csv", sep="_"),
-      boundary_figure_path = paste(bed_base, "transcriptboundariess.pdf", sep="_")
+      boundary_figure_path = paste(bed_base, "transcriptboundaries.pdf", sep="_")
     )
   )
 }
@@ -70,19 +70,28 @@ for (bed in bed_inputs) {
 ## Compare samples
 
 ```{r}
-samples_metadata <- read.csv(params$samples_metadata)
+samples_metadata <- params$samples_metadata %>%
+  read.csv()
+
 samples_metadata
+```
+
+```{r}
+dir(full.names=TRUE, pattern="transcriptboundaries.csv")
 ```
 
 ```{r}
 coverage_tables <- "." %>%
   dir(full.names=TRUE, pattern="transcriptboundaries.csv") %>%
-  map_df(read.csv, .id=FILENAME) %>%
+  setNames(., .) %>%
+  map_df(read.csv, .id="FILENAME") %>%
   bind_rows() %>%
   mutate(
-    CONDITION = basename(FILENAME),
-    CONDITION = gsub("transcriptboundaries.csv", "", CONDITION)
-  )
+    SAMPLE = basename(FILENAME),
+    SAMPLE = gsub("^.*/", "", SAMPLE),
+    SAMPLE = gsub("_transcriptboundaries.csv", "", SAMPLE)
+  ) %>%
+  left_join(samples_metadata, by=c(SAMPLE="Sample"))
 
 head(coverage_tables)
 ```
@@ -95,13 +104,13 @@ coverage_tables %>%
       "promoters", "transcripts", "threeUTRs", "exons", "introns", "fiveUTRs"
     ))
   ) %>%
-  ggplot(aes(x = bins, y = meanCoverage, color = CONDITION, fill = CONDITION)) + 
-  geom_ribbon(
-    aes(
-      ymin = meanCoverage - standardError * 1.96,
-      ymax = meanCoverage + standardError * 1.96
-    )
-  ) + 
+  ggplot(aes(x = bins, y = meanCoverage, group=SAMPLE, color = Condition, fill = Condition)) + 
+  #geom_ribbon(
+  #  aes(
+  #    ymin = meanCoverage - standardError * 1.96,
+  #    ymax = meanCoverage + standardError * 1.96
+  #  ), alpha = 0.1
+  #) + 
   geom_line() +
   scale_fill_npg() +
   scale_color_npg() +
