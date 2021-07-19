@@ -1,0 +1,97 @@
+---
+title: "`r params$report_title`"
+author: "`r params$report_author`"
+date: "`r params$report_time`"
+output:
+  html_document:
+    toc: True
+params:
+  report_title: "Calculate UTR-to-exon ratios for multiple samples"
+  report_author: "Anonymus"
+  report_time: !r format(Sys.Date(), format="%d/%m/%Y")
+  genome_annotation: "s3://encode-public/2019/06/04/8f6cba12-2ebe-4bec-a15d-53f498979de0/gencode.v29.primary_assembly.annotation_UCSC_names.gtf.gz"
+  samples_metadata: "/home/rstudio/local_files/example_data/samples_meta.csv"
+  input_bed_folder: "/home/rstudio/local_files/example_data/beds"
+---
+
+## Setup
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
+library(ggsci)
+```
+
+## Retrieve genome annotation
+
+```{r}
+remove_gtf <- FALSE
+genome_annotation_gtf <- params$genome_annotation
+if (substr(params$genome_annotation, 1, 5) == "s3://") {
+  genome_annotation_gtf <- "tmp_gtf.gtf.gz"
+  remove_gtf <- TRUE
+  system(
+    paste(
+      "aws s3 cp", params$genome_annotation,
+      genome_annotation_gtf, "--no-sign-request", sep=" "
+    ),
+    intern=FALSE
+  )
+}
+```
+
+## Parse individual samples
+
+```{r}
+bed_inputs <- dir(params$input_bed_folder, full.names=TRUE)
+bed_inputs
+```
+
+```{r}
+for (bed in bed_inputs) {
+  bed_base <- unlist(strsplit(basename(bed), '.', fixed=TRUE))[1]
+  rmarkdown::render(
+    "transcript_boundary_coverage_single_sample_template.Rmd",
+    output_file = paste(paste(bed_base, "coverage", sep="_"), "html", sep="."),
+    params = list(
+      report_author = params$report_author,
+      report_title = paste("UTR to exon ratios for", bed_base, sep=" "),
+      genome_annotation = genome_annotation_gtf,
+      input_path = bed,
+      boundary_table_path = paste(bed_base, "utrtoexon.csv", sep="_"),
+      boundary_figure_path = paste(bed_base, "utrtoexons.pdf", sep="_")
+    )
+  )
+}
+```
+
+## Compare samples
+
+```{r}
+samples_metadata <- params$samples_metadata %>%
+  read.csv()
+
+samples_metadata
+```
+
+```{r}
+dir(full.names=TRUE, pattern="utrtoexon.csv")
+```
+
+```{r}
+utre_tables <- "." %>%
+  dir(full.names=TRUE, pattern=".csv") %>%
+  setNames(., .) %>%
+  map_df(read.csv, .id="FILENAME") %>%
+  bind_rows() %>%
+  mutate(
+    SAMPLE = basename(FILENAME),
+    SAMPLE = gsub("^.*/", "", SAMPLE),
+    SAMPLE = gsub("_utrtoexon.csv", "", SAMPLE)
+  ) %>%
+  left_join(samples_metadata, by=c(SAMPLE="Sample"))
+
+head(utre_tables)
+```
