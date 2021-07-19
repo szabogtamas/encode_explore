@@ -1,0 +1,133 @@
+---
+title: "`r params$report_title`"
+author: "`r params$report_author`"
+date: "`r params$report_time`"
+output:
+  html_document:
+    toc: True
+params:
+  report_title: "Show transcript feature types for a single sample"
+  report_author: "Anonymus"
+  report_time: !r format(Sys.Date(), format="%d/%m/%Y")
+  genome_annotation: "s3://encode-public/2019/06/04/8f6cba12-2ebe-4bec-a15d-53f498979de0/gencode.v29.primary_assembly.annotation_UCSC_names.gtf.gz"
+  input_path: "ENCFF465VPI.bed"
+  feature_table_path: "ENCFF465VPI_features.csv"
+  feature_figure_path: "ENCFF465VPI_features.pdf"
+---
+
+## Setup
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(RCAS)
+library(GenomicRanges)
+library(GenomicFeatures)
+library(ggplot2)
+library(ggsci)
+```
+
+## Parse genome annotation
+
+```{r}
+remove_gtf <- FALSE
+genome_annotation_gtf <- params$genome_annotation
+if (substr(params$genome_annotation, 1, 5) == "s3://") {
+  genome_annotation_gtf <- "tmp_gtf.gtf.gz"
+  remove_gtf <- TRUE
+  system(
+    paste(
+      "aws s3 cp", params$genome_annotation,
+      genome_annotation_gtf, "--no-sign-request", sep=" "
+    ),
+    intern=FALSE
+  )
+}
+```
+
+```{r}
+genome_range_features <- importGtf(genome_annotation_gtf)
+txdb_features <- getTxdbFeaturesFromGRanges(genome_range_features)
+if (remove_gtf) unlink(genome_annotation_gtf)
+```
+
+## Feature types
+
+```{r}
+sample_bed <- importBed(filePath=params$input_path, sampleN=5000)
+N_features <- length(sample_bed)
+```
+
+```{r}
+summary <- summarizeQueryRegions(queryRegions = sample_bed, txdbFeatures = txdb_features)
+summary
+```
+
+```{r}
+p1 <- summary %>%
+  data.frame() %>%
+  mutate(
+    percent = round((count / N_features), 3)
+  ) %>%
+  rownames_to_column("feature") %>%
+  ggplot(aes(x = reorder(feature, -percent), y = percent, fill = feature, label = count)) + 
+  geom_col() + 
+  geom_label(aes(y = percent + 0.03)) + 
+  scale_y_continuous(labels = scales::percent) +
+  labs(x = '', y = paste0("Percent overlap (n = ", N_features, ")")) + 
+  scale_fill_npg() +
+  theme_bw(base_size=14) + 
+  theme(
+    axis.text.x = element_text(angle=30, hjust=1),
+    legend.position = "none"
+  )
+
+p1
+```
+
+```{r}
+range_overlaps <- as.data.table(queryGff(queryRegions = sample_bed, gffData = genome_range_features))
+head(range_overlaps)
+```
+
+```{r}
+transcript_info <- range_overlaps %>%
+  dplyr::distinct(
+    gene_id, gene_name, gene_type, transcript_type, type, query_name, query_score,
+    width
+  )
+
+write.csv(transcript_info, params$feature_table_path, row.names=FALSE)
+
+head(transcript_info)
+```
+
+```{r}
+trx_overlap_tab <- transcript_info %>%
+  dplyr::distinct(gene_name, query_name, gene_type) %>%
+  count(gene_type, name="count") %>%
+  arrange(desc(count))
+
+p2 <- trx_overlap_tab %>%
+  mutate(
+    gene_type = factor(gene_type, levels = trx_overlap_tab$gene_type)
+  ) %>%
+  head(9) %>%
+  ggplot(aes(x = gene_type, y = count, fill = gene_type, label = count)) + 
+  geom_col() + 
+  geom_label(aes(y = count + 3)) + 
+  labs(x = "", y = "Number of\noverlapping reads") + 
+  scale_fill_npg() +
+  theme_bw(base_size=14) + 
+  theme(
+    axis.text.x = element_text(angle=30, hjust=1),
+    legend.position = "none"
+  )
+
+p2
+```
+
+```{r}
+ggsave(params$feature_figure_path, gridExtra::arrangeGrob(p1, p2))
+```
