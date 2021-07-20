@@ -60,8 +60,8 @@ for (bed in bed_inputs) {
       report_title = paste("UTR to exon ratios for", bed_base, sep=" "),
       genome_annotation = genome_annotation_gtf,
       input_path = bed,
-      boundary_table_path = paste(bed_base, "utrtoexon.csv", sep="_"),
-      boundary_figure_path = paste(bed_base, "utrtoexons.pdf", sep="_")
+      utre_table_path = paste(bed_base, "utrtoexon.csv", sep="_"),
+      utre_figure_path = paste(bed_base, "utrtoexons.pdf", sep="_")
     )
   )
 }
