@@ -112,18 +112,37 @@ txdb_db <- makeTxDbFromGRanges(genome_range_features)
 annotated_GR <- exonsBy(txdb_db, by="gene")
 ```
 
+## Show ENCODE peaks
+
 ```{r}
 region_query <- GRanges(
   seqnames=params$chromosome,
   ranges=IRanges(start=params$genomic_range[1], end=params$genomic_range[2]),
   strand="+"
 )
-focused_region_of_genome <- subsetByOverlaps(annotated_GR, region_query)
 ```
 
-## Show ENCODE peaks
+```{r}
+transcript_annot_tab <- genome_range_features %>%
+  subsetByOverlaps(region_query) %>%
+  data.frame() %>%
+  distinct(gene_id, gene_name, strand) %>%
+  mutate(transcript_id = gene_id)
+```
+
 ```{r warning=FALSE, fig.height=9.6, fig.width=4.8}
-plotCoverage(focused_region_of_genome, track_data=local_samples_df, heights=c(4,1))
+track_data_tab <- local_samples_df %>%
+  mutate(
+    sample_id = factor(sample_id, levels=local_samples_df$sample_id),
+    track_id = factor(track_id, levels=local_samples_df$track_id)
+  )
+
+annotated_GR %>%
+  subsetByOverlaps(region_query) %>%
+  plotCoverage(
+    track_data=track_data_tab, transcript_annotations=transcript_annot_tab, 
+    flanking_length=c(500, 500), heights=c(4,1), fill_palette=pal_npg()(9),
+  )
 ```
 
 ## Download BAM files to show transcript features
