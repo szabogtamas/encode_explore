@@ -31,6 +31,7 @@ RUN install2.r --error \
     heatmaply \
     RColorBrewer \
     ggsci \
+    ggridges \
     pROC \
     openxlsx \
     readxl \
