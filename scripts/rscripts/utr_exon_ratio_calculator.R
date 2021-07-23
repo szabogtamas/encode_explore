@@ -46,9 +46,7 @@ cat("Genome annotation parsed.\n")
 ### Annotate samples BED file
 transcript_info <- bed %>%
   importBed() %>%
-  queryGff(queryRegions=., gffData=genome_range_features)
-
-transcript_info <- transcript_info %>%
+  queryGff(queryRegions=., gffData=genome_range_features) %>%
   data.frame() %>%
   dplyr::distinct(
     gene_id, gene_name, gene_type, transcript_type, type, query_name, query_score,
