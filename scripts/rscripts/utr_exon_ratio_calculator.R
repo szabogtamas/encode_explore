@@ -65,6 +65,7 @@ trx_type_tab <- transcript_info %>%
   dplyr::filter(type %in% c("exon", "UTR")) %>%
   dplyr::count(gene_name, type) %>%
   pivot_wider(names_from=type, values_from=n, values_fill=0) %>%
+  left_join(gene_sizes, by="gene_name") %>%
   mutate(
     utr_to_exon = UTR / exon,
     FILENAME = basename(bed)
