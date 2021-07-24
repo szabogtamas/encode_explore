@@ -53,6 +53,10 @@ transcript_info <- bed %>%
     width
   )
 
+gene_sizes <- transcript_info %>%
+  arrange(width) %>%
+  dplyr::distinct(gene_name, width)
+
 cat("Retrieved anotations for bed file.\n")
 
 ### Calculate ratio of UTR to exon reads
