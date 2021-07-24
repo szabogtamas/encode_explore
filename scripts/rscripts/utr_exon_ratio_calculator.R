@@ -21,7 +21,7 @@ library(RCAS)
 library(GenomicRanges)
 library(GenomicFeatures)
 
-### Download annotation if not loacl file
+### Download annotation if not local file
 
 remove_gtf <- FALSE
 genome_annotation_gtf <- annotation_gtf
