@@ -62,7 +62,8 @@ trx_type_tab <- transcript_info %>%
   dplyr::count(gene_name, type) %>%
   pivot_wider(names_from=type, values_from=n, values_fill=0) %>%
   mutate(
-    utr_to_exon = UTR / exon
+    utr_to_exon = UTR / exon,
+    FILENAME = basename(bed)
   )
 
 write.csv(trx_type_tab, output_path, row.names=FALSE)
