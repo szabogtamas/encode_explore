@@ -54,7 +54,7 @@ transcript_info <- bed %>%
   )
 
 gene_sizes <- transcript_info %>%
-  arrange(width) %>%
+  arrange(desc(width)) %>%
   dplyr::distinct(gene_name, width)
 
 cat("Retrieved anotations for bed file.\n")
