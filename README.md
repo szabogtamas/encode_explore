@@ -17,4 +17,7 @@ u can check out the [R version of the explorative notebook](notebooks/R/encode_s
 
 Files are downloaded from S3 using awscli.  
 BigWig files are parsed with the help of [pyBigWig](https://github.com/deeptools/pyBigWig).  
-Additionally, some common data analysis packages, such as NumPy, Pandas and Seaborn are also required.
+Additionally, some common data analysis packages, such as NumPy, Pandas and Seaborn are also required.  
+  
+For the R version of the notebook, [Rocker](https://www.rocker-project.org) is indispensable.
+BigWig files are visualized using [wiggleplotr](https://bioconductor.org/packages/release/bioc/html/wiggleplotr.html). 
