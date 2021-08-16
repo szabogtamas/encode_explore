@@ -43,6 +43,7 @@ RUN R -e "BiocManager::install('ggbio')"
 RUN R -e "BiocManager::install('wiggleplotr')"
 RUN R -e "BiocManager::install('EnsDb.Hsapiens.v86')"
 RUN R -e "BiocManager::install('RCAS')"
+RUN R -e "BiocManager::install('Rsubread')"    
 
 RUN chmod a+rwx -R /home/rstudio
 ADD ./configs/rstudio-prefs.json /home/rstudio/.config/rstudio/rstudio-prefs.json
