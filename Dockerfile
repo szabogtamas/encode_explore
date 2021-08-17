@@ -18,9 +18,6 @@ RUN pip3 install numpy && \
 
 ENV PATH=/usr/local/bin:$PATH
 
-ADD ./scripts /usr/local/dev_scripts
-ADD ./notebooks /usr/local/notebooks
-
 RUN install2.r --error \
     --deps TRUE \
     devtools \
@@ -46,4 +43,7 @@ RUN R -e "BiocManager::install('RCAS')"
 RUN R -e "BiocManager::install('Rsubread')"    
 
 RUN chmod a+rwx -R /home/rstudio
+
+ADD ./scripts /usr/local/dev_scripts
+ADD ./notebooks /usr/local/notebooks
 ADD ./configs/rstudio-prefs.json /home/rstudio/.config/rstudio/rstudio-prefs.json
