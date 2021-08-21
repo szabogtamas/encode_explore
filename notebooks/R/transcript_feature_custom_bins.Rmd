@@ -1,0 +1,91 @@
+---
+title: "`r params$report_title`"
+author: "`r params$report_author`"
+date: "`r params$report_time`"
+output:
+  html_document:
+    toc: True
+params:
+  report_title: "Get start site of genes and create bins for histogram"
+  report_author: "Anonymus"
+  report_time: !r format(Sys.Date(), format="%d/%m/%Y")
+  genome_annotation: "s3://encode-public/2019/06/04/8f6cba12-2ebe-4bec-a15d-53f498979de0/gencode.v29.primary_assembly.annotation_UCSC_names.gtf.gz"
+---
+
+## Setup
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(RCAS)
+library(GenomicRanges)
+library(GenomicFeatures)
+library(ggplot2)
+library(ggsci)
+```
+
+## Parse genome annotation
+
+```{r}
+remove_gtf <- FALSE
+genome_annotation_gtf <- params$genome_annotation
+if (substr(params$genome_annotation, 1, 5) == "s3://") {
+  genome_annotation_gtf <- "tmp_gtf.gtf.gz"
+  remove_gtf <- TRUE
+  system(
+    paste(
+      "aws s3 cp", params$genome_annotation,
+      genome_annotation_gtf, "--no-sign-request", sep=" "
+    ),
+    intern=FALSE
+  )
+}
+```
+
+```{r}
+genome_range_features <- importGtf(genome_annotation_gtf)
+txdb_features <- getTxdbFeaturesFromGRanges(genome_range_features)
+if (remove_gtf) unlink(genome_annotation_gtf)
+```
+
+## Filter first exons
+
+```{r}
+firstexons <- txdb_features$exons[txdb_features$exons$exon_rank == 1]
+firstexons <- firstexons[strand(firstexons) == "+"]
+head(firstexons)
+```
+```{r}
+full_gtf <- read.table("gencode.gtf", sep="\t")
+head(full_gtf)
+```
+
+
+```{r}
+rtracklayer::export(firstexons, "tmp.gtf")
+exon_data <- read.table("tmp.gtf", sep="\t")
+head(exon_data)
+```
+
+```{r}
+hijack_gtf <- exon_data %>%
+  mutate(
+    WINDOW = purrr::map(V4, function(x) seq(0, 4000, 50))
+  ) %>%
+  unnest(WINDOW) %>%
+  mutate(
+    V2 = "GENCODE_BIN",
+    V3 = "exon",
+    V4 = V4 + 2000 - WINDOW,
+    V5 = V4 + 50,
+    EXID = stringr::str_extract(V9, "exon_id \\d+; exon_name .*; exon_rank \\d+; "),
+    V9 = paste(EXID, "gene_name Pos", WINDOW - 2000, ";", sep="")
+  ) %>%
+  dplyr::select(-WINDOW, -EXID)
+```
+
+```{r}
+write.table(hijack_gtf, "encode_bins.gtf", quote=FALSE, col.names=FALSE, row.names=FALSE, sep="\t")
+```
+
