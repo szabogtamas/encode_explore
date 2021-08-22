@@ -114,8 +114,8 @@ position_counts <- "/home/rstudio/local_files/counts" %>%
 
 ```{r}
 position_counts %>%
-  ggplot(aes(x=Position, y=Count, color=Condition)) +
+  ggplot(aes(x=Position, y=Count, fill=Condition)) +
   geom_boxplot() +
-  scale_color_npg() +
+  scale_fill_npg() +
   theme_bw(base_size=14)
 ```
