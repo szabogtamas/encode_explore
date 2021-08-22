@@ -89,3 +89,23 @@ hijack_gtf <- exon_data %>%
 write.table(hijack_gtf, "encode_bins.gtf", quote=FALSE, col.names=FALSE, row.names=FALSE, sep="\t")
 ```
 
+## Process featureCounts
+
+```{r}
+position_counts <- "/home/rstudio/local_files/counts" %>%
+  dir(full.names=TRUE) %>%
+  setNames(., gsub("\\.markup.*", "", basename(.))) %>%
+  purrr::map(function(x) {
+    x %>%
+      read.table() %>%
+      .[-1, c(1, 7)]
+  }) %>%
+  bind_rows(.id="Sample") %>%
+  mutate(
+    Sample = gsub("_counts.*", "", Sample)
+  )
+```
+
+
+
+
