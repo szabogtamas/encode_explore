@@ -103,8 +103,17 @@ position_counts <- "/home/rstudio/local_files/counts" %>%
   bind_rows(.id="Sample") %>%
   mutate(
     Sample = gsub("_counts.*", "", Sample)
-  )
+  ) %>%
+  dplyr::rename(Position = V1, Count = V7) %>%
+  mutate(Condition = gsub("_R\\d+", "", Sample))
 ```
+
+
+```{r}
+position_counts %>%
+  ggplot(aes(x=V1, y=V7))
+```
+
 
 
 
