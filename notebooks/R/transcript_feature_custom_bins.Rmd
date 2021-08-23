@@ -79,6 +79,8 @@ hijack_gtf <- exon_data %>%
     V3 = "exon",
     V4 = V4 + 2000 - WINDOW,
     V5 = V4 + 50,
+    V4 = as.character(V4),
+    V5 = as.character(V5),
     EXID = stringr::str_extract(V9, "exon_id \\d+; exon_name .*; exon_rank \\d+; "),
     V9 = paste(EXID, "gene_name Pos", WINDOW - 2000, ";", sep="")
   ) %>%
@@ -89,7 +91,12 @@ hijack_gtf <- exon_data %>%
 write.table(hijack_gtf, "encode_bins.gtf", quote=FALSE, col.names=FALSE, row.names=FALSE, sep="\t")
 ```
 
-## Process featureCounts
+## Process featureCounts#
+
+```{r}
+binned_gtf <- read.table("encode_bins.gtf", sep="\t")
+head(binned_gtf)
+```
 
 ```{r}
 position_counts <- "/home/rstudio/local_files/counts" %>%
@@ -113,9 +120,71 @@ position_counts <- "/home/rstudio/local_files/counts" %>%
 ```
 
 ```{r}
+position_counts <- position_counts %>%
+  group_by(Sample) %>%
+  mutate(Full_depth = sum(Count, na.rm=TRUE)) %>%
+  ungroup() %>%
+  mutate(
+    Coverage = Count/Full_depth
+  ) %>%
+  dplyr::select(-Full_depth)
+```
+
+```{r}
+pos_labs <- position_counts$Position %>%
+  unique() %>%
+  .[order(.)] %>%
+  paste("c", ., sep="")
+
 position_counts %>%
-  ggplot(aes(x=Position, y=Count, fill=Condition)) +
+  mutate(
+    Position_c = paste("c", Position, sep=""),
+    Position_c = factor(Position_c, levels=pos_labs)
+  ) %>%
+  dplyr::filter(Position > -2000, Position < 2000) %>%
+  ggplot(aes(x=Position_c, y=Count, fill=Condition)) +
   geom_boxplot() +
   scale_fill_npg() +
-  theme_bw(base_size=14)
+  theme_bw(base_size=14) +
+  theme(
+    axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=1)
+  ) +
+  labs(x="")
+```
+
+```{r}
+position_counts %>%
+  mutate(
+    Position_c = paste("c", Position, sep=""),
+    Position_c = factor(Position_c, levels=pos_labs)
+  ) %>%
+  dplyr::filter(Position > -2000, Position < -500) %>%
+  dplyr::filter(Condition %in% c("KO6_27_Sh", "KO6_GFP_Sh")) %>%
+  ggplot(aes(x=Position_c, y=Count, fill=Condition)) +
+  geom_boxplot() +
+  scale_fill_npg() +
+  theme_bw(base_size=14) +
+  theme(
+    axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=1)
+  ) +
+  labs(x="")
+```
+
+
+```{r}
+position_counts %>%
+  mutate(
+    Position_c = paste("c", Position, sep=""),
+    Position_c = factor(Position_c, levels=pos_labs)
+  ) %>%
+  dplyr::filter(Position > -2000, Position < 2000) %>%
+  dplyr::filter(Condition %in% c("KO6_27_Sh", "KO6_GFP_Sh")) %>%
+  ggplot(aes(x=Position_c, y=Coverage, fill=Condition)) +
+  geom_boxplot() +
+  scale_fill_npg() +
+  theme_bw(base_size=14) +
+  theme(
+    axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=1)
+  ) +
+  labs(x="")
 ```
