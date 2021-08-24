@@ -63,8 +63,8 @@ head(full_gtf)
 
 
 ```{r}
-rtracklayer::export(firstexons, "tmp.gtf")
-exon_data <- read.table("tmp.gtf", sep="\t")
+rtracklayer::export(firstexons, "rt_tmp.gtf")
+exon_data <- read.table("rt_tmp.gtf", sep="\t")
 head(exon_data)
 ```
 
@@ -116,11 +116,7 @@ position_counts <- "/home/rstudio/local_files/counts" %>%
     Condition = gsub("_R\\d+", "", Sample),
     Count = as.numeric(Count),
     Position = as.numeric(gsub("Pos", "", Position))
-  )
-```
-
-```{r}
-position_counts <- position_counts %>%
+  ) %>%
   group_by(Sample) %>%
   mutate(Full_depth = sum(Count, na.rm=TRUE)) %>%
   ungroup() %>%
@@ -131,17 +127,46 @@ position_counts <- position_counts %>%
 ```
 
 ```{r}
+position_counts <- "/home/rstudio/local_files/binned_multicounts.csv" %>%
+  read.csv() %>%
+  pivot_longer(-Position) %>%
+  dplyr::rename(
+    Sample = name,
+    Count = value
+  ) %>%
+  mutate(
+    Sample = gsub("_counts.*", "", Sample),
+    Condition = gsub("_R\\d+", "", Sample),
+    Count = as.numeric(Count),
+    Position = as.numeric(gsub("Pos", "", Position))
+  ) %>%
+  dplyr::filter(Position > -2000, Position < 2000) %>%
+  group_by(Sample) %>%
+  mutate(Full_depth = sum(Count, na.rm=TRUE)) %>%
+  ungroup() %>%
+  mutate(
+    Coverage = Count/Full_depth
+  ) %>%
+  dplyr::select(-Full_depth)
+
+head(position_counts)
+```
+
+```{r}
 pos_labs <- position_counts$Position %>%
   unique() %>%
   .[order(.)] %>%
   paste("c", ., sep="")
 
-position_counts %>%
+position_counts <- position_counts %>%
   mutate(
     Position_c = paste("c", Position, sep=""),
     Position_c = factor(Position_c, levels=pos_labs)
-  ) %>%
-  dplyr::filter(Position > -2000, Position < 2000) %>%
+  )
+```
+
+```{r}
+position_counts %>%
   ggplot(aes(x=Position_c, y=Count, fill=Condition)) +
   geom_boxplot() +
   scale_fill_npg() +
@@ -149,16 +174,26 @@ position_counts %>%
   theme(
     axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=1)
   ) +
+  scale_x_discrete(breaks = levels(position_counts$Position_c)[c(T, rep(F, 4))]) +
   labs(x="")
 ```
 
 ```{r}
 position_counts %>%
-  mutate(
-    Position_c = paste("c", Position, sep=""),
-    Position_c = factor(Position_c, levels=pos_labs)
-  ) %>%
-  dplyr::filter(Position > -2000, Position < -500) %>%
+  ggplot(aes(x=Position_c, y=Coverage, fill=Condition)) +
+  geom_boxplot() +
+  scale_fill_npg() +
+  theme_bw(base_size=14) +
+  theme(
+    axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=1)
+  ) +
+  scale_x_discrete(breaks = levels(position_counts$Position_c)[c(T, rep(F, 4))]) +
+  labs(x="")
+```
+
+```{r}
+position_counts %>%
+  dplyr::filter(Position > -1000, Position < 500) %>%
   dplyr::filter(Condition %in% c("KO6_27_Sh", "KO6_GFP_Sh")) %>%
   ggplot(aes(x=Position_c, y=Count, fill=Condition)) +
   geom_boxplot() +
@@ -167,6 +202,22 @@ position_counts %>%
   theme(
     axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=1)
   ) +
+  scale_x_discrete(breaks = levels(position_counts$Position_c)[c(T, rep(F, 3))]) +
+  labs(x="")
+```
+
+```{r}
+position_counts %>%
+  dplyr::filter(Position > -1000, Position < 500) %>%
+  dplyr::filter(Condition %in% c("KO6_27_Sh", "KO6_GFP_Sh")) %>%
+  ggplot(aes(x=Position_c, y=Coverage, fill=Condition)) +
+  geom_boxplot() +
+  scale_fill_npg() +
+  theme_bw(base_size=14) +
+  theme(
+    axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=1)
+  ) +
+  scale_x_discrete(breaks = levels(position_counts$Position_c)[c(T, rep(F, 3))]) +
   labs(x="")
 ```
 
