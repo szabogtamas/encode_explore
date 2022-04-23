@@ -38,10 +38,13 @@ RUN install2.r --error \
 RUN R -e "devtools::install_github('kassambara/ggpubr')"
 RUN R -e "BiocManager::install('ggbio')"
 RUN R -e "BiocManager::install('wiggleplotr')"
-RUN R -e "BiocManager::install('EnsDb.Hsapiens.v86')"
 RUN R -e "BiocManager::install('RCAS')"
 RUN R -e "BiocManager::install('Rsubread')"
-RUN R -e "BiocManager::install('edgeR')"
+RUN R -e "BiocManager::install('Gviz')"
+RUN R -e "BiocManager::install('plyranges')"
+RUN R -e "BiocManager::install('EnsDb.Hsapiens.v86')"
+RUN R -e "BiocManager::install('EnsDb.Mmusculus.v79')"
+RUN R -e "BiocManager::install('clusterProfiler')"
 
 RUN chmod a+rwx -R /home/rstudio
 
